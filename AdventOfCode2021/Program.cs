@@ -7,9 +7,8 @@ namespace AdventOfCode2021
     {
         static void Main(string[] args)
         {
-            var day = new Day4();
+            var day = new Day5();
             day.GetResult();
-            Console.WriteLine("Hello World!");
 
             Console.ReadLine();
         }
