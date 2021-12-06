@@ -73,25 +73,25 @@ namespace AdventOfCode2021.Days
                 {
                     PopulateValuesWhenYSameDimension(hydrothermalVenturePointDictionary, hydrothermalVenture);
                 }
-
-                var result = hydrothermalVenturePointDictionary.Values.Count(e => e.Occurrences >= 2);
             }
+
+            var result = hydrothermalVenturePointDictionary.Values.Count(e => e.Occurrences >= 2);
         }
 
-        private static Dictionary<(int, int), HydrothermalVenturePoint> PopulateDictionary(List<HydrothermalVenture> hydrothermalVentureListPartOne)
+        private static Dictionary<(int, int), HydrothermalVenturePoint> PopulateDictionary(List<HydrothermalVenture> hydrothermalVentureList)
         {
-            var maxXStart = hydrothermalVentureListPartOne.Select(h => h.Start.X).Max();
-            var maxXEnd = hydrothermalVentureListPartOne.Select(h => h.End.X).Max();
+            var maxXStart = hydrothermalVentureList.Select(h => h.Start.X).Max();
+            var maxXEnd = hydrothermalVentureList.Select(h => h.End.X).Max();
             var maxX = Math.Max(maxXStart, maxXEnd);
-            var minXStart = hydrothermalVentureListPartOne.Select(h => h.Start.X).Min();
-            var minXEnd = hydrothermalVentureListPartOne.Select(h => h.End.X).Min();
+            var minXStart = hydrothermalVentureList.Select(h => h.Start.X).Min();
+            var minXEnd = hydrothermalVentureList.Select(h => h.End.X).Min();
             var minX = Math.Min(minXStart, minXEnd);
 
-            var maxYStart = hydrothermalVentureListPartOne.Select(h => h.Start.Y).Max();
-            var maxYEnd = hydrothermalVentureListPartOne.Select(h => h.End.Y).Max();
+            var maxYStart = hydrothermalVentureList.Select(h => h.Start.Y).Max();
+            var maxYEnd = hydrothermalVentureList.Select(h => h.End.Y).Max();
             var maxY = Math.Max(maxYStart, maxYEnd);
-            var minYStart = hydrothermalVentureListPartOne.Select(h => h.Start.Y).Min();
-            var minYEnd = hydrothermalVentureListPartOne.Select(h => h.End.Y).Min();
+            var minYStart = hydrothermalVentureList.Select(h => h.Start.Y).Min();
+            var minYEnd = hydrothermalVentureList.Select(h => h.End.Y).Min();
             var minY = Math.Min(minYStart, minYEnd);
 
 
