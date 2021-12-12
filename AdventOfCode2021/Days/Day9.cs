@@ -6,34 +6,45 @@ namespace AdventOfCode2021.Days
 {
     public class Day9
     {
+        public class LowerPoint : Element
+        {
+            public List<NeighborForBasin> DirectNeighbors { get; set; }
+
+        }
+
+        public class NeighborForBasin : Element
+        {
+            public List<NeighborForBasin> DirectNeighbors { get; set; }
+        }
+
+        public class Element
+        {
+            public int RowIndex { get; set; }
+            public int ColumnIndex { get; set; }
+            public int ElementValue { get; set; }
+        }
+        private Dictionary<(int, int), NeighborForBasin> dictionaryNeighbor = new Dictionary<(int, int), NeighborForBasin>();
+
+        private HashSet<(int, int)> hashParsedElements = new HashSet<(int, int)>();
+
+        private Dictionary<(int, int), int> numberBasinElements = new Dictionary<(int, int), int>();
+
+        private List<LowerPoint> lowerPoints;
+
+        private LowerPoint currentLowerPoint;
+
+        private int[,] heightmap;
         public void GetResult()
         {
             GetPartOne();
-            //GetPartTwo();
+            GetPartTwo();
         }
 
         private void GetPartOne()
         {
-
-            var rows = startingInput.Split(new string[] { "\r\n" },
-                                           StringSplitOptions.RemoveEmptyEntries);
-
-
-            var numberRows = rows.Count();
-            var numberColumns = rows[0].Count();
-
-            var heightmap = new int[numberRows, numberColumns];
-
-
-            for (int i = 0; i < numberRows; i++)
-            {
-                var row = rows[i];
-                for (int j = 0; j < numberColumns; j++)
-                {
-                    var value = row[j].ToString();
-                    heightmap[i, j] = int.Parse(value);
-                }
-            }
+            int numberRows, numberColumns;
+            int[,] heightmap;
+            PopulateHightMap(out numberRows, out numberColumns, out heightmap);
 
             int finalSum = 0;
 
@@ -68,10 +79,167 @@ namespace AdventOfCode2021.Days
             var fine = string.Empty;
         }
 
+        private void PopulateHightMap(out int numberRows, out int numberColumns, out int[,] heightmap)
+        {
+            var rows = startingInput.Split(new string[] { "\r\n" },
+                                                       StringSplitOptions.RemoveEmptyEntries);
+
+
+            numberRows = rows.Count();
+            numberColumns = rows[0].Count();
+            heightmap = new int[numberRows, numberColumns];
+            for (int i = 0; i < numberRows; i++)
+            {
+                var row = rows[i];
+                for (int j = 0; j < numberColumns; j++)
+                {
+                    var value = row[j].ToString();
+                    heightmap[i, j] = int.Parse(value);
+                }
+            }
+        }
 
         private void GetPartTwo()
         {
-           
+            int numberRows, numberColumns;
+
+            PopulateHightMap(out numberRows, out numberColumns, out heightmap);
+            lowerPoints = new List<LowerPoint>();
+            for (int i = 0; i < numberRows; i++)
+            {
+                for (int j = 0; j < numberColumns; j++)
+                {
+                    var value = heightmap[i, j];
+
+                    int up = int.MaxValue;
+                    int down = int.MaxValue;
+                    int left = int.MaxValue;
+                    int right = int.MaxValue;
+
+                    NeighborForBasin upNeighbor = null;
+                    NeighborForBasin downNeighbor = null;
+                    NeighborForBasin leftNeighbor = null;
+                    NeighborForBasin rightNeighbor = null;
+
+                    NeighborForBasin currentNeighbor = new NeighborForBasin { ElementValue = value, RowIndex = i, ColumnIndex = j, DirectNeighbors = new List<NeighborForBasin>() };
+
+                    if (i - 1 >= 0)
+                    {
+                        up = heightmap[i - 1, j];
+                        upNeighbor = new NeighborForBasin { ElementValue = up, RowIndex = i - 1, ColumnIndex = j };
+                        currentNeighbor.DirectNeighbors.Add(upNeighbor);
+
+                        //if (!dictionaryParsedElements.ContainsKey((i - 1, j)))
+                        //    dictionaryParsedElements[(i - 1, j)] = upNeighbor;
+                    }
+
+                    if (i + 1 < numberRows)
+                    {
+                        down = heightmap[i + 1, j];
+                        downNeighbor = new NeighborForBasin { ElementValue = down, RowIndex = i + 1, ColumnIndex = j };
+                        currentNeighbor.DirectNeighbors.Add(downNeighbor);
+
+                        //if (!dictionaryParsedElements.ContainsKey((i + 1, j)))
+                        //    dictionaryParsedElements[(i + 1, j)] = downNeighbor;
+                    }
+
+                    if (j - 1 >= 0)
+                    {
+                        left = heightmap[i, j - 1];
+                        leftNeighbor = new NeighborForBasin { ElementValue = left, RowIndex = i, ColumnIndex = j - 1 };
+                        currentNeighbor.DirectNeighbors.Add(leftNeighbor);
+
+                        //if (!dictionaryParsedElements.ContainsKey((i , j -1)))
+                        //    dictionaryParsedElements[(i, j - 1)] = leftNeighbor;
+                    }
+
+                    if (j + 1 < numberColumns)
+                    {
+                        right = heightmap[i, j + 1];
+                        rightNeighbor = new NeighborForBasin { ElementValue = right, RowIndex = i, ColumnIndex = j + 1 };
+                        currentNeighbor.DirectNeighbors.Add(rightNeighbor);
+
+                        //if (!dictionaryParsedElements.ContainsKey((i, j + 1)))
+                        //    dictionaryParsedElements[(i, j + 1)] = rightNeighbor;
+                    }
+
+                    if (value < up && value < down && value < left && value < right)
+                    {
+                        var lowerPoint = new LowerPoint { ElementValue = value, RowIndex = i, ColumnIndex = j, DirectNeighbors = new List<NeighborForBasin>() };
+                        if (upNeighbor != null)
+                            lowerPoint.DirectNeighbors.Add(upNeighbor);
+
+                        if (downNeighbor != null)
+                            lowerPoint.DirectNeighbors.Add(downNeighbor);
+
+                        if (leftNeighbor != null)
+                            lowerPoint.DirectNeighbors.Add(leftNeighbor);
+
+                        if (rightNeighbor != null)
+                            lowerPoint.DirectNeighbors.Add(rightNeighbor);
+
+                        lowerPoints.Add(lowerPoint);
+
+                        numberBasinElements[(lowerPoint.RowIndex, lowerPoint.ColumnIndex)] = 1;
+                    }
+
+                    if (!dictionaryNeighbor.ContainsKey((i, j)))
+                        dictionaryNeighbor[(i, j)] = currentNeighbor;
+
+
+
+                }
+            }
+
+            foreach (var lowerPoint in lowerPoints)
+            {
+                currentLowerPoint = lowerPoint;
+                hashParsedElements.Add((lowerPoint.RowIndex, lowerPoint.ColumnIndex));
+                ParseDirectNeighbor(lowerPoint.DirectNeighbors);
+            }
+
+            CalculateFinalScorePartTwo();
+
+        }
+
+        private void CalculateFinalScorePartTwo()
+        {
+            var selectedElement = numberBasinElements.Values.ToList().OrderByDescending(e => e);
+            var first = selectedElement.ElementAt(0);
+            var second = selectedElement.ElementAt(1);
+            var third = selectedElement.ElementAt(2);
+
+            var finalResult = first * second * third;
+            var stopme = string.Empty;
+
+        }
+
+        private void ParseDirectNeighbor(List<NeighborForBasin> directNeighbors)
+        {
+            if (directNeighbors == null) return;
+            foreach (var neighbor in directNeighbors)
+            {
+                if (neighbor.ElementValue == 9 || hashParsedElements.Contains((neighbor.RowIndex, neighbor.ColumnIndex)))
+                {
+                    dictionaryNeighbor.Remove((neighbor.RowIndex, neighbor.ColumnIndex));
+                    continue;
+                }
+
+                //Increment the count of elements
+                numberBasinElements[(currentLowerPoint.RowIndex, currentLowerPoint.ColumnIndex)] += 1;
+
+                //We add the elements to the parsed
+                hashParsedElements.Add((neighbor.RowIndex, neighbor.ColumnIndex));
+
+                if (dictionaryNeighbor.ContainsKey((neighbor.RowIndex, neighbor.ColumnIndex)))
+                {
+                    var currentElementWithNeighbor = dictionaryNeighbor[(neighbor.RowIndex, neighbor.ColumnIndex)];
+                    dictionaryNeighbor.Remove((neighbor.RowIndex, neighbor.ColumnIndex));
+                    var directNeighborsCurrentElement = currentElementWithNeighbor.DirectNeighbors;
+
+                    ParseDirectNeighbor(directNeighborsCurrentElement);
+                }
+            }
         }
 
         #region input
